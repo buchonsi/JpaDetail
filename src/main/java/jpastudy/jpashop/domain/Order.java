@@ -30,6 +30,7 @@ public class Order {
 
     //Delivery와 1대 1관계
     //cascade All : 객체의 상태가 어떻게 바뀌든 이 객체의 라이프 사이클과 함께 하겠다...
+    //order만 저장하면 delivery도 저장됨
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "delivery_id")
     private Delivery delivery;
@@ -45,5 +46,23 @@ public class Order {
     @Enumerated(EnumType.STRING)
     private OrderStatus status;
 
+    //연관관계 메서드
+    //order와 member(N:1)
+    public void setMember(Member member){
+        this.member = member;
+        member.getOrder().add(this);
+    }
+
+    //order와 delivery(1:1)
+    public void setDelivery(Delivery delivery){
+        this.delivery = delivery;
+        delivery.setOrder(this);
+    }
+
+    //order와 orderItem(1:N)
+    public void addOrderItem(OrderItem orderItem){
+        this.orderItems.add(orderItem);
+        orderItem.setOrder(this);
+    }
 
 }
