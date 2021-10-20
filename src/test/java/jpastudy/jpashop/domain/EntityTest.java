@@ -36,7 +36,7 @@ class EntityTest {
         //delivery생성
         Delivery delivery = new Delivery();
         delivery.setAddress(member.getAddress());
-        delivery.setDeliveryStatus(DeliveryStatus.READY);
+        delivery.setStatus(DeliveryStatus.READY);
 
         //delivery와 order연결
         order.setDelivery(delivery);
