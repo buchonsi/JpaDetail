@@ -67,7 +67,7 @@ public class ItemController {
         model.addAttribute("bookForm", bookForm);
         return "items/updateItemForm";
     }
-    @PostMapping(value = "/items/{itemId}/edit")
+//    @PostMapping(value = "/items/{itemId}/edit")
     public String updateItem(@ModelAttribute("bookForm") BookForm form) {
         Book book = new Book();
         book.setId(form.getId());
@@ -77,6 +77,12 @@ public class ItemController {
         book.setAuthor(form.getAuthor());
         book.setIsbn(form.getIsbn());
         itemService.saveItem(book);
+        return "redirect:/items";
+    }
+    //dirty checking 사용
+    @PostMapping(value = "/items/{itemId}/edit")
+    public String updateItemDirtyChecking(@ModelAttribute("bookForm") BookForm form) {
+        itemService.updateItem(form.getId(),form.getName(),form.getPrice());
         return "redirect:/items";
     }
 }

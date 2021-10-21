@@ -4,6 +4,7 @@
 <body>
 <div class="container">
   <div th:replace="fragments/bodyHeader :: bodyHeader"/>
+<!--  action을 사용하지 않아도 @GetMapping과 @PostMapping의 매핑이 같으면 알아서 submit한다.-->
   <form th:object="${bookForm}" method="post">
     <!-- id -->
     <input type="hidden" th:field="*{id}" />
