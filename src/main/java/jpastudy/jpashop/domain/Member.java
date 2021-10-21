@@ -17,6 +17,8 @@ public class Member {
     @Column(name = "member_id")
     private Long id;
 
+    //NotEmpty 사용한 검증은 사용하지 않는 것이 좋음
+    //@NotEmpty
     private String name;
 
     @Embedded
