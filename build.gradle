@@ -44,7 +44,8 @@ dependencies {
 	implementation 'com.querydsl:querydsl-jpa'
 	//querydsl 추가
 	implementation 'com.querydsl:querydsl-apt'
-
+	// hibernate5 모듈(Jackson)
+	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-hibernate5'
 }
 
 test {

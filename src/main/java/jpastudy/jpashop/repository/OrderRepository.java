@@ -23,6 +23,15 @@ public class OrderRepository {
         return em.find(Order.class, id);
     }
 
+    //성능 최적화를 위해 fetch join 사용
+    public List<Order> findAllWithMemberDelivery() {
+        return em.createQuery(
+                        "select o from Order o" +
+                                " join fetch o.member m" +
+                                " join fetch o.delivery d", Order.class)
+                .getResultList();
+    }
+
     //Querydsl을 이용한 동적쿼리
     public List<Order> findAll(OrderSearch orderSearch) {
 //      return em.createQuery("select o from Order o", Order.class).getResultList();
