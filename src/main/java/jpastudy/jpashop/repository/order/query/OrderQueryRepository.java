@@ -5,6 +5,8 @@ import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * 1:N 관계(컬렉션)을 제외한
@@ -60,5 +62,81 @@ public class OrderQueryRepository {
 
         return orderQueryDtos;
     }
+
+    /**
+     * OrderQueryDto가 참조하는 OrderItemQueryDto를 채워 넣기
+     * Order, Member, Delivery : 쿼리 1번
+     * Order, OrderItem, Item : 쿼리 1번
+     * Refectoring : 이전 코드
+     */
+    public List<OrderQueryDto> findOrdersQueryDtos_optimize_before(){
+        List<OrderQueryDto> orders = findOrders();
+
+        //OrderId 목록을 List<Long>으로 추출하기
+        //List<OrderQueryDto> n --> List<Long>
+        List<Long> orderIds = orders.stream()
+                .map(order -> order.getOrderId())       //Stream<Long>
+                .collect(Collectors.toList());          //List<Long>
+
+        List<OrderItemQueryDto> orderItems = em.createQuery(
+                        "select new jpastudy.jpashop.repository.order.query.OrderItemQueryDto" +
+                                "(oi.order.id, i.name, oi.orderPrice, oi.count)" +
+                                " from OrderItem oi" +
+                                " join oi.item i" +
+                                " where oi.order.id in :orderIds", OrderItemQueryDto.class)
+                .setParameter("orderIds", orderIds)
+                .getResultList();
+
+        //Map<Long, List<OrderItemQueryDto>>
+        //Map<OrderId(주문번호), OrderItemQueryDto 목록>
+        Map<Long, List<OrderItemQueryDto>> orderItemMap =
+                                        orderItems.stream()         //Stream<OrderItemQueryDto>
+                                                .collect(Collectors.groupingBy(orderItem -> orderItem.getOrderId()));
+        orders.forEach(orderQD -> orderQD.setOrderItems(orderItemMap.get(orderQD.getOrderId())));
+        return orders;
+
+    }
+
+    public List<OrderQueryDto> findOrdersQueryDtos_optimize_after(){
+        List<OrderQueryDto> orders = findOrders();
+
+        //Order, ToMany관계인 Member, Delivery, Item을 조회하기
+        //조회한 OrderItem을 OrderId를 key값인 Map에 저장하기
+        Map<Long, List<OrderItemQueryDto>> orderItemMap = getOrderItems(getOrderIds(orders));
+
+        //Map에서 OrderId와 매핑하는 OrderItem 리스트를 OrderQueryDto에 연결해주기
+        orders.forEach(orderQD -> orderQD.setOrderItems(orderItemMap.get(orderQD.getOrderId())));
+        return orders;
+
+    }
+
+    //Refectoring으로 생성한 메소드
+    //ctrl + alt + m
+    private Map<Long, List<OrderItemQueryDto>> getOrderItems(List<Long> orderIds) {
+        List<OrderItemQueryDto> orderItems = em.createQuery(
+                        "select new jpastudy.jpashop.repository.order.query.OrderItemQueryDto" +
+                                "(oi.order.id, i.name, oi.orderPrice, oi.count)" +
+                                " from OrderItem oi" +
+                                " join oi.item i" +
+                                " where oi.order.id in :orderIds", OrderItemQueryDto.class)
+                .setParameter("orderIds", orderIds)
+                .getResultList();
+
+        //Map<Long, List<OrderItemQueryDto>>
+        //Map<OrderId(주문번호), OrderItemQueryDto 목록>
+        return orderItems.stream()         //Stream<OrderItemQueryDto>
+                .collect(Collectors.groupingBy(orderItem -> orderItem.getOrderId()));
+    }
+
+    //Refectoring으로 생성한 메소드
+    //ctrl + alt + m
+    private List<Long> getOrderIds(List<OrderQueryDto> orders) {
+        //OrderId 목록을 List<Long>으로 추출하기
+        //List<OrderQueryDto> n --> List<Long>
+        return orders.stream()
+                .map(order -> order.getOrderId())       //Stream<Long>
+                .collect(Collectors.toList());
+    }
+
 
 }

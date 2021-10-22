@@ -2,6 +2,8 @@ package jpastudy.jpashop.api;
 
 import jpastudy.jpashop.domain.*;
 import jpastudy.jpashop.repository.OrderRepository;
+import jpastudy.jpashop.repository.order.query.OrderQueryDto;
+import jpastudy.jpashop.repository.order.query.OrderQueryRepository;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,6 +22,7 @@ import static java.util.stream.Collectors.toList;
 @RequiredArgsConstructor
 public class OrderApiContorller {
     private final OrderRepository orderRepository;
+    private final OrderQueryRepository orderQueryRepository;
 
     /**
      * V1: 엔티티를 API에 직접 노출하는 방식
@@ -85,6 +88,23 @@ public class OrderApiContorller {
                 .collect(toList());//List<OrderDtd>
         return orderDtoList;
 
+    }
+
+    /**
+     * V4 : 쿼리를 수행할 때 Dto에 저장했기 떄문에 그대로 사용하면 된다.
+     */
+    @GetMapping("/api/v4/orders")
+    public List<OrderQueryDto> ordersV4(){
+
+        return orderQueryRepository.findOrdersQueryDto();
+    }
+
+    /**
+     * V5 : 쿼리 갯수를 줄이기 위해서 Stream() 의 GroupingBy를 사용한 메서드 호출
+     */
+    @GetMapping("/api/v5/orders")
+    public List<OrderQueryDto> orderV5(){
+        return orderQueryRepository.findOrdersQueryDtos_optimize_after();
     }
 
     //응답과 요청에 사용항 DTO InnerClass 선언
