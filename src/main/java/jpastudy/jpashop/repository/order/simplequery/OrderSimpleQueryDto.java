@@ -6,6 +6,7 @@ import lombok.Data;
 
 import java.time.LocalDateTime;
 
+//조회한 결과를 담을 용도로 사용하는 Dto
 @Data
 public class OrderSimpleQueryDto {
     private Long orderId;

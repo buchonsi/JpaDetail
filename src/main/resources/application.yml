@@ -11,9 +11,11 @@ spring: #띄어쓰기 없음
       hibernate: #띄어쓰기 6칸
         show_sql: true #띄어쓰기 8칸
         format_sql: true #띄어쓰기 8칸
+        default_batch_fetch_size: 1000    #ToMany관계에 있는 참조관계를 가져오는 최대 건수
 logging.level: #띄어쓰기 없음
   org.hibernate.sql: debug #띄어쓰기 2칸
   #org.hibernate.type: trace #띄어쓰기 2칸 #
 
 server:
   port: 8087
+
